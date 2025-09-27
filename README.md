@@ -40,29 +40,27 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
 
 ## 🛠️ Despliegue Paso a Paso sistemas Linux
 1.   **Actualizar el Sistema:**
-     Antes de instalar nada, es fundamental que actualices la lista de paquetes y las versiones de tu sistema.
+     Antes de instalar nada, es fundamental que actualices la lista de paquetes y las versiones de tu sistema:
     ```bash
      sudo apt update
      sudo apt upgrade -y
     ```
 
-2.   **Identificar el Driver Recomendado:**
-     Usa el siguiente comando para que Ubuntu te muestre los drivers disponibles y te sugiera cuál es el mejor para tu GPU.
-     
-    ```bash
-     ubuntu-drivers devices
-    ```
 
+2.  **Identificar el Driver Recomendado:**
+    Usa el siguiente comando para que Ubuntu te muestre los drivers disponibles y te sugiera cuál es el mejor para tu GPU:
+    ```bash
+    ubuntu-drivers devices
+    ```
     La salida te mostrará una lista de drivers, con una recomendación entre paréntesis, como (recommended).
 
-3.   **Instalar el Driver Recomendado:**
-
-    Ahora, usa el comando autoinstall para que Ubuntu instale automáticamente el driver recomendado y las dependencias necesarias.
-    
+3.  **Instalar el Driver Recomendado:**
+    Ahora, usa el comando autoinstall para que Ubuntu instale automáticamente el driver recomendado y las dependencias necesarias:
     ```bash
     sudo ubuntu-drivers autoinstall
     ```
     Este proceso se encarga de todo, incluso de instalar el kit de herramientas CUDA si es necesario para el driver.
+
 4.  **Reiniciar el Servidor:**
     Para que los cambios surtan efecto y el kernel cargue los nuevos controladores, debes reiniciar el servidor.
 
