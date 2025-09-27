@@ -52,22 +52,26 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
     ```bash
      ubuntu-drivers devices
     ```
+
     La salida te mostrará una lista de drivers, con una recomendación entre paréntesis, como (recommended).
 
 3.   **Instalar el Driver Recomendado:**
 
     Ahora, usa el comando autoinstall para que Ubuntu instale automáticamente el driver recomendado y las dependencias necesarias.
+    
     ```bash
     sudo ubuntu-drivers autoinstall
     ```
     Este proceso se encarga de todo, incluso de instalar el kit de herramientas CUDA si es necesario para el driver.
 4.  **Reiniciar el Servidor:**
     Para que los cambios surtan efecto y el kernel cargue los nuevos controladores, debes reiniciar el servidor.
-    ```Bash
+
+    ```bash
     sudo reboot
     ```
 5. **Verificar la Instalación:**
     Una vez que el servidor se haya reiniciado, vuelve a iniciar sesión y ejecuta el comando nvidia-smi.
+
     ```bash
     nvidia-smi
     ```
