@@ -16,11 +16,11 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
 
 ---
 
-## 🛠️ Despliegue Paso a Paso
+## 🛠️ Despliegue Paso a Paso sistemas Windows
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone [https://github.com/tu-usuario/agente-llm-multimodal.git](https://github.com/tu-usuario/agente-llm-multimodal.git)
+    git clone [https://github.com/dfedez920912/agente-llm-multimodal.git](https://github.com/dfedez920912/agente-llm-multimodal.git)
     cd agente-llm-multimodal
     ```
 2.  **Configurar las variables de entorno:**
@@ -35,6 +35,43 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
     docker-compose up --build -d
     ```
     El servicio estará disponible en `http://localhost:8000`.
+
+    Actualizar el Sistema:
+
+## 🛠️ Despliegue Paso a Paso sistemas Linux
+1.   **Actualizar el Sistema:**
+     Antes de instalar nada, es fundamental que actualices la lista de paquetes y las versiones de tu sistema.
+     ```bash
+     sudo apt update
+     sudo apt upgrade -y
+    ```
+
+2.   **Identificar el Driver Recomendado:**
+     Usa el siguiente comando para que Ubuntu te muestre los drivers disponibles y te sugiera cuál es el mejor para tu GPU.
+     
+     ```bash
+     ubuntu-drivers devices
+     ´´´
+     La salida te mostrará una lista de drivers, con una recomendación entre paréntesis, como (recommended).
+
+3.   **Instalar el Driver Recomendado:**
+
+    Ahora, usa el comando autoinstall para que Ubuntu instale automáticamente el driver recomendado y las dependencias necesarias.
+    ```bash
+    sudo ubuntu-drivers autoinstall
+    ```
+    Este proceso se encarga de todo, incluso de instalar el kit de herramientas CUDA si es necesario para el driver.
+4.  **Reiniciar el Servidor:**
+    Para que los cambios surtan efecto y el kernel cargue los nuevos controladores, debes reiniciar el servidor.
+    ```Bash
+    sudo reboot
+    ```
+5. **Verificar la Instalación:**
+    Una vez que el servidor se haya reiniciado, vuelve a iniciar sesión y ejecuta el comando nvidia-smi.
+    ```bash
+    nvidia-smi
+    ```
+    Si la instalación fue exitosa, verás una tabla con la información de tu GPU, el uso de VRAM y la versión del driver.  Si el comando no funciona, algo salió mal durante la instalación y tendrás que revisar los logs.
 
 ---
 
