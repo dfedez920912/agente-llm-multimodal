@@ -42,15 +42,14 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
 
 ¡Gracias a estos increíbles colaboradores! 
 
-<a href="https://github.com/tu-usuario-1"><img src="https://github.com/tu-usuario-1.png" width="50" alt="Nombre del Contribuidor 1"></a>
-<a href="https://github.com/tu-usuario-2"><img src="https://github.com/tu-usuario-2.png" width="50" alt="Nombre del Contribuidor 2"></a>
+<a href="https://github.com/dfedez920912"><img src="https://github.com/tu-usuario-1.png" width="50" alt="Daniel Fernandez Sotolongo"></a>
 ---
 
 ## ❤️ Apoyar el Proyecto
 
 Si este proyecto te ha sido útil, por favor considera apoyar su desarrollo. ¡Cada donación ayuda a cubrir los costos y a seguir mejorando! [attachment_0](attachment).
 
-* **PayPal**: [Tu enlace de PayPal.me]
+* **PayPal**: [daniel920912@gmail.com]
 * **EnZona (Cuba)**: Escanea el código QR para donar. 
 * **Transfermóvil (Cuba)**: Envía tu donación a mi número de teléfono. 
-* **QvaPay**: [Tu enlace de QvaPay]
+* **QvaPay**: [dfedez920912] 
