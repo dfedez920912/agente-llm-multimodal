@@ -1,0 +1,13 @@
+# requirements.txt
+fastapi
+uvicorn
+python-multipart
+requests
+Pillow
+pydub  # Para manejar archivos de audio
+scipy
+torch
+transformers
+bitsandbytes
+auto-gptq
+accelerate
