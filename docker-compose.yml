@@ -6,21 +6,20 @@ services:
     build: .
     restart: always
     environment:
-      # Carga las variables de los modelos y la API_KEY del archivo .env
+      # Carga todas las variables del archivo .env
       - API_KEY=${API_KEY}
       - LLM_MODEL_NAME=${LLM_MODEL_NAME}
       - VL_LLM_MODEL_NAME=${VL_LLM_MODEL_NAME}
       - ASR_MODEL_NAME=${ASR_MODEL_NAME}
+      - MODEL_LOADING_STRATEGY=${MODEL_LOADING_STRATEGY}
     ports:
       - "8000:8000"
     volumes:
-      # Opcional: Monta un volumen para cachear los modelos descargados y evitar descargas repetidas
       - model-cache:/root/.cache/huggingface
     deploy:
       resources:
         reservations:
           devices:
-            # Habilita el acceso a la GPU. Se debe tener instalado Docker-NVIDIA-Toolkit.
             - driver: nvidia
               count: all
               capabilities: [gpu]
