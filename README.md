@@ -52,7 +52,7 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
     ```bash
      ubuntu-drivers devices
     ```
-     La salida te mostrará una lista de drivers, con una recomendación entre paréntesis, como (recommended).
+    La salida te mostrará una lista de drivers, con una recomendación entre paréntesis, como (recommended).
 
 3.   **Instalar el Driver Recomendado:**
 
