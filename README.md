@@ -41,7 +41,7 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
 ## 🛠️ Despliegue Paso a Paso sistemas Linux
 1.   **Actualizar el Sistema:**
      Antes de instalar nada, es fundamental que actualices la lista de paquetes y las versiones de tu sistema.
-     ```bash
+    ```bash
      sudo apt update
      sudo apt upgrade -y
     ```
@@ -49,9 +49,9 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
 2.   **Identificar el Driver Recomendado:**
      Usa el siguiente comando para que Ubuntu te muestre los drivers disponibles y te sugiera cuál es el mejor para tu GPU.
      
-     ```bash
+    ```bash
      ubuntu-drivers devices
-     ´´´
+    ```
      La salida te mostrará una lista de drivers, con una recomendación entre paréntesis, como (recommended).
 
 3.   **Instalar el Driver Recomendado:**
