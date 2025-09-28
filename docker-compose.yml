@@ -1,28 +1,21 @@
 # docker-compose.yml
 version: '3.8'
-
 services:
   llm-agent:
     build: .
     restart: always
     environment:
-      # Carga todas las variables del archivo .env
       - API_KEY=${API_KEY}
       - LLM_MODEL_NAME=${LLM_MODEL_NAME}
       - VL_LLM_MODEL_NAME=${VL_LLM_MODEL_NAME}
       - ASR_MODEL_NAME=${ASR_MODEL_NAME}
       - MODEL_LOADING_STRATEGY=${MODEL_LOADING_STRATEGY}
+      - NVIDIA_VISIBLE_DEVICES=all
     ports:
       - "8000:8000"
     volumes:
       - model-cache:/root/.cache/huggingface
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+    runtime: nvidia
 
 volumes:
   model-cache:
