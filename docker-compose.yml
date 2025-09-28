@@ -2,6 +2,7 @@
 version: '3.8'
 services:
   llm-agent:
+    container_name: ${CONTAINER_NAME} # <-- Nombre del contenedor
     build: .
     restart: always
     environment:
@@ -10,13 +11,18 @@ services:
       - VL_LLM_MODEL_NAME=${VL_LLM_MODEL_NAME}
       - ASR_MODEL_NAME=${ASR_MODEL_NAME}
       - MODEL_LOADING_STRATEGY=${MODEL_LOADING_STRATEGY}
-      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_VISIBLE_DEVICES=all  # <-- Mover esta línea aquí
     ports:
       - "8000:8000"
     volumes:
       - model-cache:/root/.cache/huggingface
-    runtime: nvidia
+    runtime: nvidia  # <-- Correcto para Windows/WSL2
 
 volumes:
   model-cache:
     driver: local
+
+networks:
+  default:
+    name: ${CONTAINER_NAME}  # <-- Nombre de la red predeterminada
+    #driver: local

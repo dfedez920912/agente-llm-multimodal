@@ -1,6 +1,5 @@
 # app.py
 import os
-import json
 import requests
 import base64
 import torch
@@ -44,6 +43,7 @@ if MODEL_LOADING_STRATEGY == "PARALLEL":
     print("Modo de carga: PARALELO. Cargando todos los modelos al inicio.")
     try:
         print(f"Cargando modelo de lenguaje: {LLM_MODEL_NAME}...")
+        # Usar AutoTokenizer para LLM de texto puro
         llm_model = AutoModelForCausalLM.from_pretrained(
             LLM_MODEL_NAME, device_map="auto", quantization_config=quantization_config
         )
@@ -194,6 +194,12 @@ async def chat_completions(request: Request, payload: RequestPayload):
 
     # 3. Generar respuesta final (siempre con el LLM principal)
     llm_model, llm_tokenizer = get_llm_model()
+    
+    # Aplicar el chat template con fallback para Llama 3
+    if llm_tokenizer.chat_template is None:
+        # Usar el template oficial de Llama 3 si no está definido
+        llm_tokenizer.chat_template = "{% for message in messages %}{% if message['role'] == 'user' %}{{ '<|start_header_id|>user<|end_header_id|>\n\n' + message['content'] + '<|eot_id|>' }}{% elif message['role'] == 'assistant' %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' + message['content'] + '<|eot_id|>' }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' }}{% endif %}"
+    
     messages_for_llm = [{"role": "user", "content": processed_input.strip()}]
     prompt = llm_tokenizer.apply_chat_template(
         messages_for_llm, tokenize=False, add_generation_prompt=True
