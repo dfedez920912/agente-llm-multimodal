@@ -91,4 +91,4 @@ Si este proyecto te ha sido útil, por favor considera apoyar su desarrollo. ¡C
 * **PayPal**: [daniel920912](https://paypal.me/dfedez?locale.x=es_XC&country.x=US)
 * **EnZona (Cuba)**: Escanea el código QR para donar. 
 * **Transfermóvil (Cuba)**: Escanea el código QR para donar. 
-* **QvaPay**: [dfedez920912](https://qvapay.com/payme/daniel920912)
+* **QvaPay**: [dfedez920912]"https://qvapay.com/payme/daniel920912"
