@@ -88,7 +88,7 @@ Este proyecto implementa un servidor LLM (Large Language Model) multimodal local
 
 Si este proyecto te ha sido útil, por favor considera apoyar su desarrollo. ¡Cada donación ayuda a cubrir los costos y a seguir mejorando! [attachment_0](attachment).
 
-* **PayPal**: [daniel920912@gmail.com]
+* **PayPal**: [daniel920912](https://paypal.me/dfedez?locale.x=es_XC&country.x=US)
 * **EnZona (Cuba)**: Escanea el código QR para donar. 
-* **Transfermóvil (Cuba)**: Envía tu donación a mi número de teléfono. 
-* **QvaPay**: [dfedez920912] 
+* **Transfermóvil (Cuba)**: Escanea el código QR para donar. 
+* **QvaPay**: [dfedez920912](https://qvapay.com/payme/daniel920912)
