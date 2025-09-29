@@ -6,7 +6,7 @@ import torch
 import tempfile
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional # Añadir Optional
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
@@ -14,6 +14,7 @@ from transformers import (
     BitsAndBytesConfig,
     pipeline
 )
+from TTS.api import TTS # Importar TTS
 from PIL import Image
 from io import BytesIO
 
@@ -22,12 +23,14 @@ API_KEY = os.getenv("API_KEY")
 LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME")
 VL_LLM_MODEL_NAME = os.getenv("VL_LLM_MODEL_NAME")
 ASR_MODEL_NAME = os.getenv("ASR_MODEL_NAME")
+TTS_MODEL_NAME = os.getenv("TTS_MODEL_NAME") # <-- Añadir esta línea
 MODEL_LOADING_STRATEGY = os.getenv("MODEL_LOADING_STRATEGY", "DYNAMIC")
 
 # --- Variables globales para modelos ---
 llm_model, llm_tokenizer = None, None
 vl_llm_model, vl_llm_processor = None, None
 asr_pipe = None
+tts_model = None # <-- Añadir esta línea
 
 app = FastAPI()
 
@@ -60,6 +63,25 @@ if MODEL_LOADING_STRATEGY == "PARALLEL":
         print(f"Cargando modelo ASR: {ASR_MODEL_NAME}...")
         asr_pipe = pipeline("automatic-speech-recognition", model=ASR_MODEL_NAME, device=0)
         print("✔ Modelo ASR cargado con éxito.")
+
+        # Cargar TTS en paralelo también (si se desea)
+        print(f"Cargando modelo de síntesis de voz: {TTS_MODEL_NAME}...")
+        # Cargar con cuantización si es posible
+        try:
+            # Intentar cargar el modelo interno con cuantización
+            # Este enfoque es complejo y específico. Para VITS, la API estándar es más directa.
+            # La biblioteca TTS internamente usa PyTorch, pero no expone directamente el modelo de transformers.
+            # Por lo tanto, la cuantización directa es difícil a través de la API estándar.
+            # Sin embargo, para VITS, que es ligero, puede ser manejable con DYNAMIC o en PARALLEL si hay VRAM.
+            # La estrategia aquí es cargarlo normalmente, pero elegir un modelo VITS ligero.
+            tts_model = TTS(model_name=TTS_MODEL_NAME, progress_bar=False, gpu=torch.cuda.is_available())
+            print("✔ Modelo de síntesis de voz cargado con éxito.")
+        except Exception as e_tts_load:
+            print(f"⚠️  No se pudo cargar TTS con cuantización directa: {e_tts_load}")
+            print("   Cargando con la API estándar. Puede usar más VRAM.")
+            tts_model = TTS(model_name=TTS_MODEL_NAME, progress_bar=False, gpu=torch.cuda.is_available())
+            print("✔ Modelo de síntesis de voz (sin cuantización directa) cargado con éxito.")
+
     except Exception as e:
         print(f"❌ Error al cargar los modelos en modo PARALELO: {e}")
         raise RuntimeError("Fallo crítico en modo PARALELO. Usa modo DYNAMIC.")
@@ -113,11 +135,27 @@ def get_asr_pipe():
             raise HTTPException(status_code=500, detail=f"Error al cargar ASR: {str(e)}")
     return asr_pipe
 
+def get_tts_model():
+    global tts_model
+    if tts_model is None:
+        print(f"Cargando modelo de síntesis de voz: {TTS_MODEL_NAME}...")
+        try:
+            # Intentar cargar con cuantización si es posible (mismo comentario que en PARALLEL)
+            # Para VITS, la API estándar es la forma más directa, aunque no cuantice directamente.
+            # La eficiencia de VRAM dependerá del modelo VITS elegido.
+            tts_model = TTS(model_name=TTS_MODEL_NAME, progress_bar=False, gpu=torch.cuda.is_available())
+            print("✔ Modelo de síntesis de voz cargado con éxito.")
+        except Exception as e:
+            print(f"❌ Error al cargar el modelo de síntesis de voz: {e}")
+            raise HTTPException(status_code=500, detail=f"Error al cargar TTS: {str(e)}")
+    return tts_model # <-- Añadir esta línea
+
 
 # --- Modelos Pydantic para la API ---
 class Message(BaseModel):
     role: str
     content: Union[str, List[Dict[str, str]]]
+    audio_content: Optional[str] = None # <-- Añadir campo para audio base64
 
 
 class RequestPayload(BaseModel):
@@ -125,6 +163,8 @@ class RequestPayload(BaseModel):
     messages: List[Message]
     max_tokens: int = 2048
     temperature: float = 0.7
+    # Añadir un campo para solicitar audio (opcional)
+    request_audio_response: bool = False # <-- Nuevo campo
 
 
 # --- Endpoint principal ---
@@ -210,11 +250,38 @@ async def chat_completions(request: Request, payload: RequestPayload):
 
     # Extraer solo la respuesta del asistente (para Llama 3)
     if "<|start_header_id|>assistant<|end_header_id|>" in decoded:
-        final_response = decoded.split("<|start_header_id|>assistant<|end_header_id|>")[-1].strip()
+        final_response_text = decoded.split("<|start_header_id|>assistant<|end_header_id|>")[-1].strip()
     else:
-        final_response = decoded
+        final_response_text = decoded
 
-    # 4. Formato OpenAI
+    # 3.1. Generar audio (TTS) si se solicitó
+    audio_base64 = None
+    if payload.request_audio_response: # <-- Comprobar si se solicitó audio
+        tts_model = get_tts_model() # <-- Cargar modelo TTS
+        # Generar el audio y guardarlo temporalmente
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_audio_out:
+            tts_model.tts_to_file(text=final_response_text, file_path=tmp_audio_out.name)
+            tmp_audio_out_path = tmp_audio_out.name
+
+        try:
+            # Leer el archivo de audio generado
+            with open(tmp_audio_out_path, "rb") as f:
+                audio_bytes = f.read()
+            # Codificar el audio a base64
+            audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
+        finally:
+            # Eliminar el archivo temporal de audio generado
+            os.unlink(tmp_audio_out_path)
+
+
+    # 4. Construir respuesta en formato OpenAI extendido
+    response_message = {
+        "role": "assistant",
+        "content": final_response_text, # Texto
+    }
+    if audio_base64:
+        response_message["audio_content"] = audio_base64 # Agregar audio si se generó
+
     return {
         "id": "chatcmpl-local-123",
         "object": "chat.completion",
@@ -222,7 +289,7 @@ async def chat_completions(request: Request, payload: RequestPayload):
         "model": "local-llm",
         "choices": [{
             "index": 0,
-            "message": {"role": "assistant", "content": final_response},
+            "message": response_message, # Usar el diccionario construido
             "finish_reason": "stop"
         }]
     }

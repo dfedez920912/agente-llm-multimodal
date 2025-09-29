@@ -11,3 +11,7 @@ transformers
 bitsandbytes
 auto-gptq
 accelerate
+# Añadir TTS
+TTS==0.22.0 # O la última versión compatible
+# Añadir soundfile (necesario para manejar audio, usado en el ASR original)
+soundfile
