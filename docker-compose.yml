@@ -3,7 +3,11 @@ version: '3.8'
 services:
   llm-agent:
     container_name: ${CONTAINER_NAME} # <-- Nombre del contenedor
-    build: .
+    build:
+      context: .
+      # Pasar el token como argumento de build
+      args:
+        - HF_TOKEN=${HF_TOKEN}
     restart: always
     environment:
       - API_KEY=${API_KEY}
@@ -12,6 +16,8 @@ services:
       - ASR_MODEL_NAME=${ASR_MODEL_NAME}
       - TTS_MODEL_NAME=${TTS_MODEL_NAME} 
       - MODEL_LOADING_STRATEGY=${MODEL_LOADING_STRATEGY}
+      # Pasar el token también como variable de entorno en tiempo de ejecución
+      - HF_TOKEN=${HF_TOKEN}
       - NVIDIA_VISIBLE_DEVICES=all  # <-- Mover esta línea aquí
     ports:
       - "8000:8000"
@@ -26,4 +32,4 @@ volumes:
 networks:
   default:
     name: ${CONTAINER_NAME}  # <-- Nombre de la red predeterminada
-    #driver: local
+    # driver: local # <-- 'local' no es un driver válido aquí. Se comenta.
