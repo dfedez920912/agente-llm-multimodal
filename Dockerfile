@@ -13,7 +13,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 # --- NUEVO: Script para descargar modelos ---
 # Copiar el script de descarga
-COPY download_models.py .
+# COPY download_models.py .
 
 # Asegurar que HF_TOKEN esté disponible como argumento de build
 ARG HF_TOKEN
