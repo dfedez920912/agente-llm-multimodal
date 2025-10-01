@@ -1,0 +1,7 @@
+# .dockerignore
+download_models.py
+# Agrega otros archivos o carpetas que no quieras copiar al contenedor
+__pycache__
+*.pyc
+.git
+.gitignore
