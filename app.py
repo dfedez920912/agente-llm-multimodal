@@ -41,6 +41,54 @@ quantization_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.bfloat16
 )
 
+# --- Funciones para descargar modelos ---
+def download_llm():
+    print(f"Descargando modelo de lenguaje: {LLM_MODEL_NAME}...")
+    # Usar AutoTokenizer para LLM
+    AutoModelForCausalLM.from_pretrained(
+        LLM_MODEL_NAME, device_map="auto", quantization_config=quantization_config
+    )
+    AutoTokenizer.from_pretrained(LLM_MODEL_NAME) # <-- Cambiado
+    print("✔ Modelo de lenguaje descargado.")
+
+def download_vl_llm():
+    print(f"Descargando modelo de visión: {VL_LLM_MODEL_NAME}...")
+    AutoModelForCausalLM.from_pretrained(
+        VL_LLM_MODEL_NAME, device_map="auto", quantization_config=quantization_config
+    )
+    AutoProcessor.from_pretrained(VL_LLM_MODEL_NAME)
+    print("✔ Modelo de visión descargado.")
+
+def download_asr():
+    print(f"Descargando modelo ASR: {ASR_MODEL_NAME}...")
+    pipeline("automatic-speech-recognition", model=ASR_MODEL_NAME)
+    print("✔ Modelo ASR descargado.")
+
+def download_tts(): # <-- Añadir esta función si TTS está integrado
+    if TTS_MODEL_NAME:
+        print(f"Descargando modelo TTS: {TTS_MODEL_NAME}...")
+        TTS(model_name=TTS_MODEL_NAME, progress_bar=False, gpu=False) # gpu=False para descarga
+        print("✔ Modelo TTS descargado.")
+    else:
+        print("⚠ No se especificó TTS_MODEL_NAME, omitiendo descarga de TTS.")
+
+# --- Endpoint para descargar modelos ---
+@app.post("/download-models")
+async def download_models(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or auth_header.split(" ")[1] != API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API Key for download endpoint")
+
+    try:
+        download_llm()
+        download_vl_llm()
+        download_asr()
+        download_tts() # <-- Añadir esta línea si TTS está integrado
+        return {"message": "Todos los modelos descargados exitosamente en el volumen."}
+    except Exception as e:
+        print(f"❌ Error al descargar modelos: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al descargar modelos: {str(e)}")
+
 # --- Carga en modo PARALELO (con manejo de errores) ---
 if MODEL_LOADING_STRATEGY == "PARALLEL":
     print("Modo de carga: PARALELO. Cargando todos los modelos al inicio.")
@@ -96,10 +144,11 @@ def get_llm_model():
     if llm_model is None:
         print(f"Cargando modelo de lenguaje: {LLM_MODEL_NAME}...")
         try:
+            # Asegúrate de que el modelo ya esté descargado antes de cargarlo
             llm_model = AutoModelForCausalLM.from_pretrained(
                 LLM_MODEL_NAME, device_map="auto", quantization_config=quantization_config
             )
-            llm_tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_NAME)
+            llm_tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_NAME) # <-- Cambiado
             print("✔ Modelo de lenguaje cargado con éxito.")
         except Exception as e:
             print(f"❌ Error al cargar el modelo de lenguaje: {e}")

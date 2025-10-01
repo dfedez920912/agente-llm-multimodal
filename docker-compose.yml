@@ -2,34 +2,27 @@
 version: '3.8'
 services:
   llm-agent:
-    container_name: ${CONTAINER_NAME} # <-- Nombre del contenedor
-    build:
-      context: .
-      # Pasar el token como argumento de build
-      args:
-        - HF_TOKEN=${HF_TOKEN}
+    # Usar la imagen descargada desde GHCR
+    image: ghcr.io/dfedez920912/agente-llm-multimodal:main # O la etiqueta que subiste
+    # build: . # <-- Comentar o eliminar esta línea
     restart: always
     environment:
       - API_KEY=${API_KEY}
       - LLM_MODEL_NAME=${LLM_MODEL_NAME}
       - VL_LLM_MODEL_NAME=${VL_LLM_MODEL_NAME}
       - ASR_MODEL_NAME=${ASR_MODEL_NAME}
-      - TTS_MODEL_NAME=${TTS_MODEL_NAME} 
+      - TTS_MODEL_NAME=${TTS_MODEL_NAME} # Si aplica
       - MODEL_LOADING_STRATEGY=${MODEL_LOADING_STRATEGY}
-      # Pasar el token también como variable de entorno en tiempo de ejecución
-      - HF_TOKEN=${HF_TOKEN}
-      - NVIDIA_VISIBLE_DEVICES=all  # <-- Mover esta línea aquí
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN} # <-- Añadir esta línea
+      - NVIDIA_VISIBLE_DEVICES=all
     ports:
       - "8000:8000"
     volumes:
       - model-cache:/root/.cache/huggingface
-    runtime: nvidia  # <-- Correcto para Windows/WSL2
+    runtime: nvidia # <-- Reemplazar 'deploy' por esta línea
+    # environment: # <-- Eliminar esta sección si existe
+    #   - NVIDIA_VISIBLE_DEVICES=all
 
 volumes:
   model-cache:
     driver: local
-
-networks:
-  default:
-    name: ${CONTAINER_NAME}  # <-- Nombre de la red predeterminada
-    # driver: local # <-- 'local' no es un driver válido aquí. Se comenta.
