@@ -1,5 +1,5 @@
 # .github/workflows/docker-build.yml
-name: Build and Push Docker Image
+name: Build and Push Docker Image (Lightweight)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }} # Ej: tu-usuario/agente-llm-multimodal
+  IMAGE_NAME: ${{ github.repository }} # Ej: dfedez920912/agente-llm-multimodal
 
 jobs:
   build-and-push:
@@ -53,17 +53,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }} # Usar token del repositorio
 
-      # Construir y subir la imagen al registro
+      # Construir y subir la imagen LIGERA al registro
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: . # Directorio donde está el Dockerfile
+          context: . # Directorio donde está el Dockerfile (sin descargas de modelos)
           push: true # Subir la imagen
           tags: ${{ steps.meta.outputs.tags }} # Etiquetas generadas arriba
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha # Usar cache de GitHub Actions
           cache-to: type=gha,mode=max # Almacenar cache en GitHub Actions
-          # --- AÑADIR ESTA LÍNEA ---
-          build-args: |
-            HF_TOKEN=${{ secrets.HF_TOKEN }}
-          # --- FIN AÑADIDO ---
+          # No se pasan build-args para modelos aquí
