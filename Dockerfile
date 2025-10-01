@@ -11,19 +11,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# --- NUEVO: Script para descargar modelos ---
-# Copiar el script de descarga
-# COPY download_models.py .
-
-# Asegurar que HF_TOKEN esté disponible como argumento de build
-ARG HF_TOKEN
-ENV HF_TOKEN=${HF_TOKEN}
-
-# Ejecutar el script de descarga durante el build
-RUN python3 download_models.py
-# --- FIN NUEVO ---
-
-# Copiar el resto de la aplicación
+# Copiar la aplicación (sin descargar modelos aquí)
 COPY . .
 
 # Exponer el puerto del servidor
